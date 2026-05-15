@@ -10,6 +10,17 @@ export interface Evento{
     index: number; // índice real da planilha, decrementar vagas 
 }
 
+// Interface que representa um agendamento
+export interface Agendamento{
+    nome: string;
+    telefone: string;
+    tipo: string;
+    data: string;
+    horario: string;
+    data_agendamento: string;
+    pagamento: string;
+}
+
 /**
  * Retorna todos os eventos disponíveis na planilha.
  * Colunas: tipo | data | horario | vagas_total | vagas_disponiveis
@@ -41,11 +52,34 @@ export async function getEventos(): Promise<Evento[]> {
  * Retorna todos os agendamentos registrados na planilha.
  * Colunas: nome | telefone | tipo | data | horario | data_agendamento | pagamento
  */
-export async function getAgendamentos() {
+export async function getAgendamentos(){
     const response = await sheetsClient.spreadsheets.values.get({
         spreadsheetId: AGENDAMENTOS_SHEET_ID,
         range: 'Agendamentos!A:G',
     });
 
     return response.data.values;
+}
+
+/**
+ * Salva um agendamento na planilha.
+ */
+
+export async function salvarAgendamento(agendamento: Agendamento): Promise<void>{
+    await sheetsClient.spreadsheets.values.append({
+        spreadsheetId: AGENDAMENTOS_SHEET_ID,
+        range: 'Agendamentos!A:G',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: [[
+                agendamento.nome,
+                agendamento.telefone,
+                agendamento.tipo,
+                agendamento.data,
+                agendamento.horario,
+                agendamento.data_agendamento,
+                agendamento.pagamento,
+            ]],
+        },
+    });
 }

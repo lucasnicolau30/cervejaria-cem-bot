@@ -1,6 +1,18 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
-import { getEventos, Evento, getAgendamentos } from '../sheets/sheetsService';      
+import { getEventos, Evento, salvarAgendamento } from '../sheets/sheetsService';      
 import qrcode from 'qrcode-terminal';
+
+// Define as etapas possíveis da conversa
+type Etapa = 'escolha_tipo' | 'escolha_evento' | 'aguardando_nome';
+
+// Interface que representa o estado atual de um usuário
+interface EstadoUsuario {
+    etapa: Etapa;
+    tipo?: string; // 'Aula' ou 'Degustação' — opcional pois só existe após escolha
+    eventosDisponiveis?: Evento[]; // eventos filtrados pelo tipo escolhido
+    eventoEscolhido?: Evento; // evento que o usuário escolheu
+
+}
 
 // Cria o cliente do bot
 const client = new Client({
@@ -24,16 +36,6 @@ client.on('ready', () => {
     console.log('✅ Bot conectado ao WhatsApp!');
 });
 
-// Define as etapas possíveis da conversa
-type Etapa = 'escolha_tipo' | 'escolha_evento' | 'aguardando_nome';
-
-// Interface que representa o estado atual de um usuário
-interface EstadoUsuario {
-    etapa: Etapa;
-    tipo?: string; // 'Aula' ou 'Degustação' — opcional pois só existe após escolha
-    eventosDisponiveis?: any[]; // eventos filtrados pelo tipo escolhido
-}
-
 // Mapa que guarda o estado de cada usuário pelo telefone
 // chave: número do telefone | valor: estado atual
 const estados = new Map<string, EstadoUsuario>();
@@ -53,7 +55,7 @@ client.on('message', async (msg) => {
     if(texto === 'quero agendar'){
         // Cria o estado inicial do usuário
         estados.set(telefone, { etapa: 'escolha_tipo' });
-        await msg.reply('🍺 Olá! Bem-vindo à Cervejaria!\n\nO que você deseja agendar?\n\n 1. Aula de fabricação\n 2. Degustação\n\nResponda com *1* ou *2*.');
+        await msg.reply('🍺 Olá! Bem-vindo à Cervejaria Cem!\n\nO que você deseja agendar?\n\n1️⃣ Aula de fabricação\n2️⃣ Degustação\n\nResponda com *1* ou *2*.');
         return;
     }
 
@@ -70,7 +72,6 @@ client.on('message', async (msg) => {
         }
 
         const tipo = texto === '1' ? 'Aula' : 'Degustação';
-        estados.set(telefone, { etapa: 'escolha_evento', tipo });
 
         // Busca os eventos disponíveis no Sheets
         const eventos = await getEventos();
@@ -96,7 +97,56 @@ client.on('message', async (msg) => {
         estados.set(telefone, { etapa: 'escolha_evento', tipo, eventosDisponiveis: eventosFiltrados });
         await msg.reply(mensagem);
         return;
+    }
 
+
+    // Etapa: usuário escolhe entre Aula ou Degustação
+    if(estado.etapa === 'escolha_evento'){
+        const eventos = estado.eventosDisponiveis || [];            
+        const opcao = parseInt(texto);
+
+        // Verifica se a opção é válida
+        if(isNaN(opcao) || opcao < 1 || opcao > eventos.length){            
+            await msg.reply(`⚠️ Por favor, escolha um número entre 1 e ${eventos.length}.`);
+            return;
+        }
+
+        // -1 pelo indíce que começa em 0
+        const eventoEscolhido = eventos[opcao - 1];
+
+        // Atualiza o estado com o evento escolhido
+        estados.set(telefone, { 
+            ...estado, // pread operator — ele copia todos os campos do estado atual.
+            etapa: 'aguardando_nome',
+            eventoEscolhido 
+        });
+
+        await msg.reply(`✅ Ótimo! Você escolheu:\n\n🍺 *${eventoEscolhido.tipo}*\n📅 ${eventoEscolhido.data} às ${eventoEscolhido.horario}\n\nQual é o seu *nome completo*?`);
+        return;
+    }
+
+    // Etapa: usuário informa o nome e o agendamento é confirmado
+    if(estado.etapa === 'aguardando_nome'){
+        const nome = msg.body.trim(); // preserva maiúsculas/minúsculas do nome
+        const evento = estado.eventoEscolhido!; // ! diz ao TypeScript que o evento existe
+        const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+
+        // Salva o agendamento na planilha
+        await salvarAgendamento({
+            nome,
+            telefone: telefone.replace('@c.us', ''), // remove o sufixo do WhatsApp
+            tipo: evento.tipo,
+            data: evento.data,
+            horario: evento.horario,
+            data_agendamento: agora,
+            pagamento: 'Pendente',
+        });
+
+        await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.tipo}\n📅 ${evento.data} às ${evento.horario}\n💰 Pagamento: no dia do evento\n\nTe esperamos! 🍻`);
+
+        // Limpa o estado do usuário
+        estados.delete(telefone);
+        return;
     }
 });
 
