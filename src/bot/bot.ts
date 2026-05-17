@@ -89,7 +89,7 @@ client.on('message', async (msg) => {
         // Monta a mensagem com as datas disponíveis
         let mensagem = `📅 *${tipo}s disponíveis:*\n\n`;
         eventosFiltrados.forEach((e, i) => {
-            mensagem += `${i + 1}. ${e.data} às ${e.horario} — ${e.vagas_disponiveis} vaga(s)\n`;
+            mensagem += `${i + 1}. *${e.nome}* | ${e.data} às ${e.horario} — ${e.vagas_disponiveis} vaga(s)\n`;
         });
         mensagem += '\nResponda com o *número* da opção desejada.';
 
@@ -121,7 +121,7 @@ client.on('message', async (msg) => {
             eventoEscolhido 
         });
 
-        await msg.reply(`✅ Ótimo! Você escolheu:\n\n🍺 *${eventoEscolhido.tipo}*\n📅 ${eventoEscolhido.data} às ${eventoEscolhido.horario}\n\nQual é o seu *nome completo*?`);
+        await msg.reply(`✅ Ótimo! Você escolheu:\n\n🍺 *${eventoEscolhido.nome}*\n📅 ${eventoEscolhido.data} às ${eventoEscolhido.horario}\n\nQual é o seu *nome completo*?`);
         return;
     }
 
@@ -136,13 +136,14 @@ client.on('message', async (msg) => {
             nome,
             telefone: telefone.replace('@c.us', ''), // remove o sufixo do WhatsApp
             tipo: evento.tipo,
+            nome_evento: evento.nome,
             data: evento.data,
             horario: evento.horario,
             data_agendamento: agora,
             pagamento: 'Pendente',
         });
 
-        await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.tipo}\n📅 ${evento.data} às ${evento.horario}\n💰 Pagamento: no dia do evento\n\nTe esperamos! 🍻`);
+        await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n💰 Pagamento: no dia do evento\n\nTe esperamos! 🍻`);
 
         // Limpa o estado do usuário
         estados.delete(telefone);

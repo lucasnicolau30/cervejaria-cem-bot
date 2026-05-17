@@ -14,7 +14,8 @@ const options: swaggerJsdoc.Options = {
                 Evento: {
                     type: 'object',
                     properties: {
-                        tipo:               { type: 'string', example: 'Degustação' },
+                        tipo:               { type: 'string', example: 'Aula' },
+                        nome:               { type: 'string', example: 'Água Cervejeira' }, // novo
                         data:               { type: 'string', example: '15/06/2026' },
                         horario:            { type: 'string', example: '19:00' },
                         vagas_total:        { type: 'integer', example: 20 },
@@ -27,6 +28,7 @@ const options: swaggerJsdoc.Options = {
                         nome:             { type: 'string', example: 'João Silva' },
                         telefone:         { type: 'string', example: '11999999999' },
                         tipo:             { type: 'string', example: 'Aula' },
+                        nome_evento:      { type: 'string', example: 'Água Cervejeira' }, // novo
                         data:             { type: 'string', example: '20/06/2026' },
                         horario:          { type: 'string', example: '18:00' },
                         data_agendamento: { type: 'string', example: '12/05/2026' },

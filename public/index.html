@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Cervejaria CEM — Cerveja artesanal</title>
+<meta name="description" content="Cervejaria CEM — Cervejas artesanais feitas com paixão. Agende sua visita e venha conhecer." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="page">
+    <!-- Brand -->
+    <header class="brand">
+      <div class="logo" aria-hidden="true">
+        <img src="img/logo.png" alt="Cervejaria CEM">
+      </div>
+      <p class="eyebrow"><span class="line"></span>Escola Especializada · Desde 2015<span class="line"></span></p>
+      <h1 class="name">Cervejaria Escola <span class="accent">Manaós</span></h1>
+      <p class="slogan">Paixão<span class="dot"></span>Técnica<span class="dot"></span>Essência</p>
+      <p class="tagline">Vem ser <strong>CEM</strong>.</p>
+    </header>
+
+    <!-- Primary CTA -->
+    <div class="stack">
+      <a
+        class="btn btn-whatsapp"
+        href="https://wa.me/5592999999999?text=Quero+agendar"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347zm-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+        </svg>
+        Agendar visita ou curso
+      </a>
+
+      <a
+        class="btn btn-social btn-instagram"
+        href="https://instagram.com/cem.manaos"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="5"/>
+          <circle cx="12" cy="12" r="4"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+        <span class="btn-label">@cem.manaos<span class="btn-sub">no Instagram</span></span>
+      </a>
+
+      <a
+        class="btn btn-social btn-youtube"
+        href="https://youtu.be/-tSmz1Qsq7U"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M21.6 7.2c-.2-.9-.9-1.6-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4c-.9.2-1.6.9-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8c.2.9.9 1.6 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z"/>
+        </svg>
+        <span class="btn-label">Tutoria CEM<span class="btn-sub">no YouTube</span></span>
+      </a>
+    </div>
+
+    <!-- Cursos -->
+    <section class="courses" aria-labelledby="courses-heading">
+      <div class="courses-head">
+        <h2 id="courses-heading" class="section-label">Próximas turmas</h2>
+        <span class="badge">Vagas limitadas</span>
+      </div>
+      <ul class="course-list" id="course-list">
+        <li class="course" style="justify-content:center;color:var(--text-muted);font-size:14px;">Carregando eventos...</li>
+      </ul>
+    </section>
+
+    <!-- Location -->
+    <section class="location" aria-labelledby="loc-heading">
+      <h2 id="loc-heading" class="section-label">Onde estamos</h2>
+      <p class="address">Rua do Lúpulo, 100<br />Bairro Cervejeiro</p>
+      <p class="address-meta">Manaus — AM · CEP 69000-000</p>
+
+      <div class="hours" role="status" aria-live="polite">
+        <span class="pulse" aria-hidden="true"></span>
+        <span><strong>Aberto agora</strong> · fecha às 23h</span>
+      </div>
+
+      <a
+        class="btn btn-maps"
+        href="https://www.google.com/maps/search/?api=1&query=Rua+do+Lúpulo+100+Manaus+AM"
+        target="_blank"
+        rel="noopener"
+      >
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Ver no Google Maps
+      </a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="divider" aria-hidden="true"></div>
+      <p>© <span id="year">2026</span> Cervejaria Escola Manaós · Beba com moderação</p>
+    </footer>
+  </main>
+
+  <script src="main.js"></script>
+</body>
+</html>

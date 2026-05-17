@@ -3,6 +3,7 @@ import { sheetsClient, EVENTOS_SHEET_ID, AGENDAMENTOS_SHEET_ID } from './sheetsC
 // Interface que representa um evento da planilha
 export interface Evento{
     tipo: string;
+    nome: string;
     data: string;
     horario: string;
     vagas_total: number;
@@ -15,6 +16,7 @@ export interface Agendamento{
     nome: string;
     telefone: string;
     tipo: string;
+    nome_evento: string;
     data: string;
     horario: string;
     data_agendamento: string;
@@ -23,12 +25,12 @@ export interface Agendamento{
 
 /**
  * Retorna todos os eventos disponíveis na planilha.
- * Colunas: tipo | data | horario | vagas_total | vagas_disponiveis
+ * Colunas: tipo | nome | data | horario | vagas_total | vagas_disponiveis
  */
 export async function getEventos(): Promise<Evento[]> {
     const response = await sheetsClient.spreadsheets.values.get({
         spreadsheetId: EVENTOS_SHEET_ID,
-        range: 'Eventos!A:E',
+        range: 'Eventos!A:F',
     });
 
     const rows = response.data.values;
@@ -39,23 +41,24 @@ export async function getEventos(): Promise<Evento[]> {
 
     return rows.slice(1).map((row, index) => ({
         tipo: row[0] || '',
-        data: row[1] || '',
-        horario: row[2] || '',
+        nome: row[1] || '',
+        data: row[2] || '',
+        horario: row[3] || '',
         // Number letra maiúscula porque é o nome da função nativa converte um valor pra número, ja que as células do sheets voltam como string 
-        vagas_total: Number(row[3]) || 0,
-        vagas_disponiveis: Number(row[4]) || 0,
+        vagas_total: Number(row[4]) || 0,
+        vagas_disponiveis: Number(row[5]) || 0,
         index: index + 2, // +2 porque começa na linha 2 (linha 1 é o cabeçalho)
     })).filter(e => e.vagas_disponiveis > 0); // filtra apenas eventos com vagas disponíveis
 }
 
 /**
  * Retorna todos os agendamentos registrados na planilha.
- * Colunas: nome | telefone | tipo | data | horario | data_agendamento | pagamento
+ * Colunas: nome | telefone | tipo | nome_evento | data | horario | data_agendamento | pagamento
  */
 export async function getAgendamentos(){
     const response = await sheetsClient.spreadsheets.values.get({
         spreadsheetId: AGENDAMENTOS_SHEET_ID,
-        range: 'Agendamentos!A:G',
+        range: 'Agendamentos!A:H',
     });
 
     return response.data.values;
@@ -68,13 +71,14 @@ export async function getAgendamentos(){
 export async function salvarAgendamento(agendamento: Agendamento): Promise<void>{
     await sheetsClient.spreadsheets.values.append({
         spreadsheetId: AGENDAMENTOS_SHEET_ID,
-        range: 'Agendamentos!A:G',
+        range: 'Agendamentos!A:H',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
             values: [[
                 agendamento.nome,
                 agendamento.telefone,
                 agendamento.tipo,
+                agendamento.nome_evento,
                 agendamento.data,
                 agendamento.horario,
                 agendamento.data_agendamento,
