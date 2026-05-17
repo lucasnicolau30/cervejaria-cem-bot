@@ -7,3 +7,4 @@ credentials.json
 public/main.js
 *.tsbuildinfo
 Thumbs.db
+readme.MD
