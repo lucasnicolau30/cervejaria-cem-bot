@@ -1,5 +1,5 @@
 import { Client, LocalAuth } from 'whatsapp-web.js';
-import { getEventos, Evento, salvarAgendamento } from '../sheets/sheetsService';      
+import { getEventos, Evento, salvarAgendamento, decrementarVaga } from '../sheets/sheetsService';      
 import qrcode from 'qrcode-terminal';
 
 // Define as etapas possíveis da conversa
@@ -55,7 +55,7 @@ client.on('message', async (msg) => {
     if(texto === 'quero agendar'){
         // Cria o estado inicial do usuário
         estados.set(telefone, { etapa: 'escolha_tipo' });
-        await msg.reply('🍺 Olá! Bem-vindo à Cervejaria Cem!\n\nO que você deseja agendar?\n\n1️⃣ Aula de fabricação\n2️⃣ Degustação\n\nResponda com *1* ou *2*.');
+        await msg.reply('🍺 Olá! Bem-vindo à Cervejaria Cem!\n\nO que você deseja agendar?\n\n1️⃣ Aula\n2️⃣ Degustação\n\nResponda com *1* ou *2*.');
         return;
     }
 
@@ -166,6 +166,8 @@ client.on('message', async (msg) => {
             pagamento: 'No dia do evento',
         });
 
+        await decrementarVaga(evento.index);
+
             await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n\n💰 Pagamento no dia do evento\n\nTe esperamos! 🍻`);
             estados.delete(telefone);
             return;
@@ -201,8 +203,10 @@ client.on('message', async (msg) => {
             data: evento.data,
             horario: evento.horario,
             data_agendamento: agora,
-            pagamento: 'Chave Pix enviada',
+            pagamento: 'Chave Pix enviada — aguardando confirmação',
         });
+
+        await decrementarVaga(evento.index);
 
         await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n\n💰 Comprovante recebido! O dono irá verificar o pagamento.\n\nTe esperamos! 🍻`);
         estados.delete(telefone);

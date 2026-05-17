@@ -87,3 +87,24 @@ export async function salvarAgendamento(agendamento: Agendamento): Promise<void>
         },
     });
 }
+
+// Decrementa uma vaga do evento após agendamento
+export async function decrementarVaga(eventoIndex: number): Promise<void> {
+    // Lê a vaga atual
+    const response = await sheetsClient.spreadsheets.values.get({
+        spreadsheetId: EVENTOS_SHEET_ID,
+        range: `Eventos!F${eventoIndex}`,
+    });
+
+    const vagasAtuais = Number(response.data.values?.[0]?.[0]) || 0;
+
+    // Atualiza com -1
+    await sheetsClient.spreadsheets.values.update({
+        spreadsheetId: EVENTOS_SHEET_ID,
+        range: `Eventos!F${eventoIndex}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+            values: [[vagasAtuais - 1]],
+        },
+    });
+}
