@@ -3,7 +3,7 @@ import { getEventos, Evento, salvarAgendamento } from '../sheets/sheetsService';
 import qrcode from 'qrcode-terminal';
 
 // Define as etapas possíveis da conversa
-type Etapa = 'escolha_tipo' | 'escolha_evento' | 'aguardando_nome';
+type Etapa = 'escolha_tipo' | 'escolha_evento' | 'aguardando_nome' | 'aguardando_pagamento' | 'aguardando_comprovante';
 
 // Interface que representa o estado atual de um usuário
 interface EstadoUsuario {
@@ -11,7 +11,7 @@ interface EstadoUsuario {
     tipo?: string; // 'Aula' ou 'Degustação' — opcional pois só existe após escolha
     eventosDisponiveis?: Evento[]; // eventos filtrados pelo tipo escolhido
     eventoEscolhido?: Evento; // evento que o usuário escolheu
-
+    nomeUsuario?: string; // nome do usuário, preenchido após etapa de nome
 }
 
 // Cria o cliente do bot
@@ -129,23 +129,82 @@ client.on('message', async (msg) => {
     if(estado.etapa === 'aguardando_nome'){
         const nome = msg.body.trim(); // preserva maiúsculas/minúsculas do nome
         const evento = estado.eventoEscolhido!; // ! diz ao TypeScript que o evento existe
+
+        // Salva o nome no estado e avança pra etapa de pagamento
+        estados.set(telefone, {
+            ...estado,
+            etapa: 'aguardando_pagamento',
+            eventoEscolhido: evento,
+            nomeUsuario: nome,
+        });
+
+        await msg.reply(`Obrigado, *${nome}*! 😊\n\nComo prefere realizar o pagamento?\n\n1️⃣ Pix antecipado\n2️⃣ No dia do evento`);     
+        return;
+    }
+
+    // Etapa: usuário escolhe forma de pagamento
+    if(estado.etapa === 'aguardando_pagamento'){
+        if(texto !== '1' && texto !== '2'){
+            await msg.reply('⚠️ Por favor, responda com *1* para Pix ou *2* para no dia do evento.');
+            return;
+        }
+
+        const nome = estado.nomeUsuario!;
+        const evento = estado.eventoEscolhido!;
         const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
 
-        // Salva o agendamento na planilha
+        // Se escolheu no dia, confirma direto
+        if(texto === '2'){
         await salvarAgendamento({
             nome,
-            telefone: telefone.replace('@c.us', ''), // remove o sufixo do WhatsApp
+            telefone: telefone.replace('@c.us', ''),
             tipo: evento.tipo,
             nome_evento: evento.nome,
             data: evento.data,
             horario: evento.horario,
             data_agendamento: agora,
-            pagamento: 'Pendente',
+            pagamento: 'No dia do evento',
         });
 
-        await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n💰 Pagamento: no dia do evento\n\nTe esperamos! 🍻`);
+            await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n\n💰 Pagamento no dia do evento\n\nTe esperamos! 🍻`);
+            estados.delete(telefone);
+            return;
+        }
 
-        // Limpa o estado do usuário
+        // Se escolheu Pix, envia a chave e aguarda comprovante
+        estados.set(telefone, {
+            ...estado,
+            etapa: 'aguardando_comprovante',
+        });
+
+        await msg.reply(`💰 Chave Pix: *00000000000*\n\nApós o pagamento, envie o *comprovante* aqui para confirmar seu agendamento!`);
+        return;
+    }
+
+    if(estado.etapa === 'aguardando_comprovante'){
+
+        const nome = estado.nomeUsuario!;
+        const evento = estado.eventoEscolhido!;
+        const agora = new Date().toLocaleString('pt-BR', { timeZone: 'America/Manaus' });
+
+        // Verifica se veio uma imagem ou PDF
+        if(msg.type !== 'image' && msg.type !== 'document'){
+            await msg.reply('⚠️ Por favor, envie uma *imagem* ou *PDF* do comprovante de pagamento.');
+            return;
+        }
+
+        await salvarAgendamento({
+            nome,
+            telefone: telefone.replace('@c.us', ''),
+            tipo: evento.tipo,
+            nome_evento: evento.nome,
+            data: evento.data,
+            horario: evento.horario,
+            data_agendamento: agora,
+            pagamento: 'Chave Pix enviada',
+        });
+
+        await msg.reply(`✅ *Agendamento confirmado, ${nome}!*\n\n🍺 ${evento.nome}\n📅 ${evento.data} às ${evento.horario}\n\n💰 Comprovante recebido! O dono irá verificar o pagamento.\n\nTe esperamos! 🍻`);
         estados.delete(telefone);
         return;
     }
