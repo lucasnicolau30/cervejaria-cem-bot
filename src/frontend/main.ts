@@ -10,13 +10,37 @@ interface Evento {
 (function () {
   const chip = document.querySelector('.hours');
   if (!chip) return;
-  const hour = new Date().getHours();
-  const open = hour >= 17 && hour < 23;
-  if (!open) {
-    chip.querySelector('span:last-child')!.innerHTML =
-      '<strong>Fechado agora</strong> · abre às 17h';
-    (chip.querySelector('.pulse') as HTMLElement).style.background = '#8a7d68';
-    (chip.querySelector('.pulse') as HTMLElement).style.animation = 'none';
+
+  const now  = new Date();
+  const day  = now.getDay(); // 0=dom, 1=seg, ..., 6=sab
+  const hour = now.getHours();
+
+  const label = chip.querySelector('span:last-child')!;
+  const pulse = chip.querySelector('.pulse') as HTMLElement;
+
+  // seg-sex: 10h-18h | sab: 14h-20h | dom: fechado
+  let open = false;
+  let fechaAs = '';
+
+  if(day >= 1 && day <= 5){
+    open    = hour >= 10 && hour < 18;
+    fechaAs = '18h';
+  } 
+  else if(day === 6){
+    open    = hour >= 14 && hour < 20;
+    fechaAs = '20h';
+  }
+
+  if(open){
+    label.innerHTML = `<strong>Aberto agora</strong> · fecha às ${fechaAs}`;
+  } 
+  else{
+    const proximo = day === 0 || day === 6
+      ? 'abre segunda às 10h'
+      : 'abre às 10h';
+    label.innerHTML = `<strong>Fechado agora</strong> · ${proximo}`;
+    pulse.style.background = '#e53e3e';
+    pulse.style.animation  = 'none';
   }
 })();
 

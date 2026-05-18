@@ -55,13 +55,26 @@ export async function getEventos(): Promise<Evento[]> {
  * Retorna todos os agendamentos registrados na planilha.
  * Colunas: nome | telefone | tipo | nome_evento | data | horario | data_agendamento | pagamento
  */
-export async function getAgendamentos(){
+export async function getAgendamentos(): Promise<Agendamento[]> {
     const response = await sheetsClient.spreadsheets.values.get({
         spreadsheetId: AGENDAMENTOS_SHEET_ID,
         range: 'Agendamentos!A:H',
     });
 
-    return response.data.values;
+    const rows = response.data.values;
+
+    if (!rows || rows.length === 0) return [];
+
+    return rows.slice(1).map((row) => ({
+        nome:             row[0] || '',
+        telefone:         row[1] || '',
+        tipo:             row[2] || '',
+        nome_evento:      row[3] || '',
+        data:             row[4] || '',
+        horario:          row[5] || '',
+        data_agendamento: row[6] || '',
+        pagamento:        row[7] || '',
+    }));
 }
 
 /**

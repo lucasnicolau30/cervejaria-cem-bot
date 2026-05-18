@@ -1,12 +1,23 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
+import path from 'node:path';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './swagger';
 import { getAgendamentos, getEventos } from './sheets/sheetsService';
 
 const app = express();
-const port = 8000;
+const port = process.env.PORT || 8000;
 
 app.use(express.json());
+
+const publicPath = path.join(__dirname, '..', 'public');
+app.use(express.static(publicPath));
+
+app.get('/', (_req, res) => {
+    res.sendFile(path.join(publicPath, 'index.html'));
+});
 
 // Documentação interativa disponível em /docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));

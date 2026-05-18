@@ -1,10 +1,7 @@
 import { google } from 'googleapis';
 import path from 'node:path';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-// Autenticação via Service Account — o arquivo credentials.json deve estar na raiz do projeto
+// Autenticação via Service Account
 const auth = new google.auth.GoogleAuth({
     keyFile: path.resolve('credentials.json'),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
