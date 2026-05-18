@@ -1,9 +1,12 @@
 import { google } from 'googleapis';
 import path from 'node:path';
 
-// Autenticação via Service Account
+const credentials = process.env.GOOGLE_CREDENTIALS
+    ? JSON.parse(process.env.GOOGLE_CREDENTIALS)
+    : undefined;
+
 const auth = new google.auth.GoogleAuth({
-    keyFile: path.resolve('credentials.json'),
+    ...(credentials ? { credentials } : { keyFile: path.resolve('credentials.json') }),
     scopes: ['https://www.googleapis.com/auth/spreadsheets'],
 });
 
