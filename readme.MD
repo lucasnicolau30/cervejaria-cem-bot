@@ -60,6 +60,7 @@ cervejaria/
 │  ├─ main.js                   # Compiled frontend script
 │  └─ img/
 │     ├─ logo.png               # Brewery logo
+│     ├─ logo-icon.png          # Brewery logo icon
 │     └─ readme/                # README screenshots
 │
 ├─ .env
